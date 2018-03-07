@@ -5,6 +5,4 @@
 
 void ButtonService(void);
 
-extern uint8_t Buttons;
-
 #endif

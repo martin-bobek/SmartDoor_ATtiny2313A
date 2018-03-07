@@ -15,10 +15,10 @@ void ButtonService() {
    static uint8_t time3 = 0;
    static uint8_t time4 = 0;
    
-   if(((tempB & BUTTON1B) == 0) != ((Buttons & BUT1)!=0)) {
+   if(((tempB & BUTTON1B) == 0) != ((G_Status & BUTTON1_FLAG)!=0)) {
      time1++;
      if(time1 == 20) {
-       Buttons ^= BUT1;
+       G_Status ^= BUTTON1_FLAG;
        time1 = 0;
      }
    }
@@ -26,10 +26,10 @@ void ButtonService() {
      time1 = 0;
    }
    //////////////////////////////////////////////////////////////
-   if(((tempB & BUTTON2B) == 0) != ((Buttons & BUT2)!=0)) {
+   if(((tempB & BUTTON2B) == 0) != ((G_Status & BUTTON2_FLAG)!=0)) {
      time2++;
      if(time2 == 20) {
-       Buttons ^= BUT2;
+       G_Status ^= BUTTON2_FLAG;
        time2 = 0;
      }
    }
@@ -37,10 +37,10 @@ void ButtonService() {
      time2 = 0;
    }
    /////////////////////////////////////////////////////////////
-   if(((tempB & BUTTON3B) == 0) != ((Buttons & BUT3)!=0)) {
+   if(((tempB & BUTTON3B) == 0) != ((G_Status & BUTTON3_FLAG)!=0)) {
      time3++;
      if(time3 == 20) {
-       Buttons ^= BUT3;
+       G_Status ^= BUTTON3_FLAG;
        time3 = 0;
      }
    }
@@ -49,10 +49,10 @@ void ButtonService() {
    }
    ////////////////////////////////////////////////////////////
    uint8_t tempD = PIND;
-   if(((tempD & BUTTON1D) == 0) != ((Buttons & BUT4)!=0)) {
+   if(((tempD & BUTTON1D) == 0) != ((G_Status & BUTTON4_FLAG)!=0)) {
      time4++;
      if(time4 == 20) {
-       Buttons ^= BUT4;
+       G_Status ^= BUTTON4_FLAG;
        time4 = 0;
      }
    }
