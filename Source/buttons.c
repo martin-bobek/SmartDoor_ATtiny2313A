@@ -7,7 +7,7 @@
 
 uint8_t Buttons;
 
-void ButtonService() {
+uint8_t ButtonService() {
   
    uint8_t tempB = PINB;
    static uint8_t time1 = 0;
@@ -59,4 +59,5 @@ void ButtonService() {
    else {
      time4 = 0;
    }
+   return Buttons;
 }
