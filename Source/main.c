@@ -1,7 +1,12 @@
 #include "util.h"
 #include "buttons.h"
+<<<<<<< HEAD
 #include "IR.h"
 #include "Outputs.h"
+=======
+
+uint8_t G_Status;
+>>>>>>> 8e7c6cd3c930cec5d5344a5e4249ed6809862b67
 
 #pragma vector=TIMER0_COMPA_vect
 __interrupt void SysTick_Handler(void);
@@ -12,14 +17,18 @@ static void SystemInit(void);
 #pragma inline=forced
 static void SystemSleep(void);
 
+<<<<<<< HEAD
 static uint8_t G_SysTick=0;
 static uint8_t G_ExpectSysTick=0;
 static uint16_t G_IRTick=0;
 static uint8_t G_Sensors = 0;
 static uint8_t G_Buttons = 0;
+=======
+static volatile uint8_t G_SysTick;
+static uint8_t G_ExpectSysTick;
+>>>>>>> 8e7c6cd3c930cec5d5344a5e4249ed6809862b67
 
-int main(void) {
-  
+__C_task void main(void) {  
   SystemInit();
   
   while(1) {
@@ -39,6 +48,7 @@ int main(void) {
 
 //output to mega: 19/17
 #pragma vector=TIMER0_COMPA_vect
+<<<<<<< HEAD
 __interrupt void SysTick_Handler() {
 
   G_SysTick++;
@@ -58,10 +68,16 @@ __interrupt void IRTick_Handler() {
   }
 }
 
+=======
+__interrupt void SysTick_Handler(void) {
+  G_SysTick++;
+}
+
+>>>>>>> 8e7c6cd3c930cec5d5344a5e4249ed6809862b67
 static void SystemInit() {
-  
-  PORTD = HEARTBEATPIN;
+  DDRD = HEARTBEATPIN;
   MCUCR = MSK(SE);                      //enable sleep mode
+<<<<<<< HEAD
   TCCR0A = MSK(WGM01);                  //set mode to CTC, top as OCR0A
   OCR0A = 0x7c;                         //set top as 124 
   TIMSK = MSK(OCIE0A) | MSK(ICIE1);                  //enables compare interrupt
@@ -75,6 +91,18 @@ static void SystemInit() {
   
   USICR = MSK(USIWM1) | MSK(USICS1) | MSK(USICS0);//two-wire mode, with external clock on negative edge
         
+=======
+  
+  USISR = MSK(USISIF) | MSK(USIOIF);    // clears interrupts before turning on USI and enabling interrupts and clears counter
+  USICR = MSK(USISIE) | MSK(USIWM1) | MSK(USICS1);        // turns on usi in twi mode
+  PORTB = TWISCL_B;                     // when USI is enabled and output driver is enabled, the pin is driven open collector (low when port is 0)
+  DDRB = TWISCL_B;                      // enables output driver on SCL pin
+
+  TCCR0A = MSK(WGM01);                  //
+  OCR0A = 0x7c;                         //compare pin for 
+  TIMSK = MSK(OCIE0A);
+  TCCR0B = MSK(CS01) | MSK(CS00);
+>>>>>>> 8e7c6cd3c930cec5d5344a5e4249ed6809862b67
   
   asm("SEI");
 }
