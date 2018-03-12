@@ -10,10 +10,6 @@ SFR_B(USIBR, 0x00)
 #define HEARTBEAT_ON()  (PORTD_Bit4 = 1)
 #define HEARTBEAT_OFF() (PORTD_Bit4 = 0)
 
-//pin11-b1
-//pin 14-b2
-//pin13-b3
-//pin12-b4
 
 extern uint8_t G_Status;
 
