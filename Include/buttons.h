@@ -3,6 +3,6 @@
 
 #include "util.h"
 
-uint8_t ButtonService(void);
+void ButtonService(void);
 
 #endif

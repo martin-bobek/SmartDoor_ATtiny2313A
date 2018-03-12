@@ -5,9 +5,7 @@
 #define BUT3    MSK(2)
 #define BUT4    MSK(3)
 
-uint8_t Buttons;
-
-uint8_t ButtonService() {
+void ButtonService() {
   
    uint8_t tempB = PINB;
    static uint8_t time1 = 0;
@@ -59,5 +57,4 @@ uint8_t ButtonService() {
    else {
      time4 = 0;
    }
-   return Buttons;
 }

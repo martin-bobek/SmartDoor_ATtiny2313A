@@ -2,7 +2,6 @@
 #include "buttons.h"
 #include "IR.h"
 
-uint8_t G_Status;
 #pragma vector=TIMER0_COMPA_vect
 __interrupt void SysTick_Handler(void);
 #pragma inline=forced
@@ -10,9 +9,7 @@ static void SystemInit(void);
 #pragma inline=forced
 static void SystemSleep(void);
 
-
-static uint8_t G_Sensors = 0;
-static uint8_t G_Buttons = 0;
+uint8_t G_Status;
 
 static volatile uint8_t G_SysTick;
 static uint8_t G_ExpectSysTick;
@@ -21,18 +18,14 @@ __C_task void main(void) {
   SystemInit();
   
   while(1) {
-    
     HEARTBEAT_ON();
 
-    G_Buttons = ButtonService();
+    ButtonService();
     IRDrive();
-    
-    G_Status = G_Buttons | (G_Sensors << 4);
     
     HEARTBEAT_OFF();
     SystemSleep();
   }
-  
 }
 
 #pragma vector=TIMER0_COMPA_vect
@@ -41,40 +34,27 @@ __interrupt void SysTick_Handler() {
   G_SysTick++;
 }
 
-  G_IRTick++;
-  if(G_IRTick == 999) {
-    TCCR1A ^= (MSK(COM1A1) | MSK(COM1B1) | MSK(COM1A0) | MSK(COM1B0));
-    if(TCCR1A == 0x0) {
-      PORTB_Bit3 = 0;
-      PORTB_Bit4 = 0;
-    }
-    G_IRTick=0;
-  }
-}
-
-
 static void SystemInit() {
-  DDRD = HEARTBEATPIN;
+  CLKPR = MSK(CLKPCE);
+  CLKPR = MSK(CLKPS0);
+  
   MCUCR = MSK(SE);                      //enable sleep mode
 
-  TCCR0A = MSK(WGM01);                  //set mode to CTC, top as OCR0A
-  OCR0A = 0x7c;                         //set top as 124 
-  TIMSK = MSK(OCIE0A) | MSK(ICIE1);     //enables compare interrupt for TIM0&1
-  TCCR0B = MSK(CS01) | MSK(CS00);       //divide CLK I/O by 64
-
+  DDRD = HEARTBEAT_D | DEBUG_D;
   
-  TCCR1A = MSK(COM1A1) | MSK(COM1B1) | MSK(COM1A0) | MSK(COM1B0); // set OC1A and OC1B on compare match, toggle when top
-  DDRB = MSK(DDB3) | (DDB4);// enable output driver for OC1A and OC1B
+  TCCR1A = 0; // set OC1A and OC1B on compare match, toggle when top
   TCCR1B = MSK(WGM13) | MSK(WGM12) | MSK(CS10); //set mode to CTC, ICR1 as top, no prescale
   ICR1 = 0x68;                          //set top as 104
-  
-  //USICR = MSK(USIWM1) | MSK(USICS1) | MSK(USICS0);//two-wire mode, with external clock on negative edge
-        
   
   USISR = MSK(USISIF) | MSK(USIOIF);    // clears interrupts before turning on USI and enabling interrupts and clears counter
   USICR = MSK(USISIE) | MSK(USIWM1) | MSK(USICS1);        // turns on usi in twi mode
   PORTB = TWISCL_B;                     // when USI is enabled and output driver is enabled, the pin is driven open collector (low when port is 0)
-  DDRB = TWISCL_B;                      // enables output driver on SCL pin
+  DDRB = TWISCL_B | IRLED1_B | IRLED2_B;// enable output driver for OC1A and OC1B;                      // enables output driver on SCL pin
+
+  TCCR0A = MSK(WGM01);                  //set mode to CTC, top as OCR0A
+  OCR0A = 0x7c;                         //set top as 124 
+  TIMSK = MSK(OCIE0A);     //enables compare interrupt for TIM0&1
+  TCCR0B = MSK(CS01) | MSK(CS00);       //divide CLK I/O by 64
 
   asm("SEI");
 }
@@ -82,8 +62,7 @@ static void SystemInit() {
 static void SystemSleep() {
   
   if(G_SysTick != G_ExpectSysTick) {
-    asm("CLI");
-    while(1);
+    PINB_Bit5 = 1;
   }
   
   while(G_SysTick == G_ExpectSysTick) {
