@@ -5,15 +5,12 @@
 uint8_t G_Status;
 #pragma vector=TIMER0_COMPA_vect
 __interrupt void SysTick_Handler(void);
-#pragma vector=TIMER1_COMPA_vect
-__interrupt void IRTick_Handler(void);
 #pragma inline=forced
 static void SystemInit(void);
 #pragma inline=forced
 static void SystemSleep(void);
 
 
-static volatile uint16_t G_IRTick;
 static uint8_t G_Sensors = 0;
 static uint8_t G_Buttons = 0;
 
@@ -28,7 +25,7 @@ __C_task void main(void) {
     HEARTBEAT_ON();
 
     G_Buttons = ButtonService();
-    G_Sensors = IRService();
+    IRDrive();
     
     G_Status = G_Buttons | (G_Sensors << 4);
     
@@ -44,9 +41,6 @@ __interrupt void SysTick_Handler() {
   G_SysTick++;
 }
 
-#pragma vector=TIMER1_COMPA_vect
-__interrupt void IRTick_Handler() {
-  
   G_IRTick++;
   if(G_IRTick == 999) {
     TCCR1A ^= (MSK(COM1A1) | MSK(COM1B1) | MSK(COM1A0) | MSK(COM1B0));
@@ -72,7 +66,7 @@ static void SystemInit() {
   TCCR1A = MSK(COM1A1) | MSK(COM1B1) | MSK(COM1A0) | MSK(COM1B0); // set OC1A and OC1B on compare match, toggle when top
   DDRB = MSK(DDB3) | (DDB4);// enable output driver for OC1A and OC1B
   TCCR1B = MSK(WGM13) | MSK(WGM12) | MSK(CS10); //set mode to CTC, ICR1 as top, no prescale
-  ICR1 = 0x34;                          //set top as 52
+  ICR1 = 0x68;                          //set top as 104
   
   //USICR = MSK(USIWM1) | MSK(USICS1) | MSK(USICS0);//two-wire mode, with external clock on negative edge
         

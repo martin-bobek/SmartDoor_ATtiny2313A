@@ -3,7 +3,7 @@
 
 #include "util.h"
 
-uint8_t IRService(void);
+void IRDrive(void);
 
 extern uint8_t Sensors;
 
